@@ -9,5 +9,10 @@
         "psr-4": {
             "DoctrineTest": "src/"
         }
+    },
+    "autoload-de": {
+        "psr-4": {
+            "DoctrineTest\\Tests": "tests/"
+        }
     }
 }
