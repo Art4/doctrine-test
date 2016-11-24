@@ -7,12 +7,12 @@
     },
     "autoload": {
         "psr-4": {
-            "DoctrineTest": "src/"
+            "DoctrineTest\\": "src/"
         }
     },
     "autoload-de": {
         "psr-4": {
-            "DoctrineTest\\Tests": "tests/"
+            "Tests\\DoctrineTest\\": "tests/"
         }
     }
 }

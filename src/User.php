@@ -35,9 +35,9 @@ class User
 
 		$metadata->mapOneToMany([
 			'fieldName' => 'posts',
-			'targetEntity' => DoctrineTest\Post::class,
+			'targetEntity' => Post::class,
 			'mappedBy' => 'author',
-			'cascade' => ['persist'],
+			'cascade' => ['persist', 'refresh'],
 		]);
 	}
 
