@@ -30,7 +30,7 @@ class DoctrineTest extends \PHPUnit_Framework_TestCase
 			$pdo = static::$entityManager->getConnection()->getWrappedConnection();
 
 			$pdo->exec("CREATE TABLE posts (id integer(9), title varchar(255), author_id integer(9))");
-			$pdo->exec("CREATE TABLE users (id integer(9), name varchar(255))");
+			$pdo->exec("CREATE TABLE users (user_id integer(9), name varchar(255))");
 		}
 
 		$this->em = static::$entityManager;

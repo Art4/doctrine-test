@@ -28,7 +28,7 @@ class User
 		$metadata->mapField([
 			'id' => true,
 			'fieldName' => 'id',
-			'columnName' => 'id',
+			'columnName' => 'user_id',
 			'type' => 'integer',
 			'length' => 9,
 		]);
