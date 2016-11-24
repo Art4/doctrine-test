@@ -10,9 +10,26 @@ use DoctrineTest\Post;
 
 class DoctrineTest extends \PHPUnit_Framework_TestCase
 {
+	private static $entityManager;
+
 	private $em;
 
 	public function setUp()
+	{
+		if (static::$entityManager === null)
+		{
+			static::$entityManager = $this->createEntityManager();
+
+			$pdo = static::$entityManager->getConnection()->getWrappedConnection();
+
+			$pdo->exec("CREATE TABLE posts (id integer(9), author_id integer(9))");
+			$pdo->exec("CREATE TABLE users (id integer(9))");
+		}
+
+		$this->em = static::$entityManager;
+	}
+
+	private function createEntityManager()
 	{
 		// Create a simple "default" Doctrine ORM configuration for static PHP
 		$isDevMode = true;
@@ -28,12 +45,7 @@ class DoctrineTest extends \PHPUnit_Framework_TestCase
 		);
 
 		// obtaining the entity manager
-		$this->em = EntityManager::create($conn, $config);
-
-		$pdo = $this->em->getConnection()->getWrappedConnection();
-
-		$pdo->exec("CREATE TABLE posts (id integer(9), author_id integer(9))");
-		$pdo->exec("CREATE TABLE users (id integer(9))");
+		return EntityManager::create($conn, $config);
 	}
 
 	public function testCreateUser()
@@ -50,16 +62,16 @@ class DoctrineTest extends \PHPUnit_Framework_TestCase
 
 		$this->assertContainsOnlyInstancesOf(User::class, $users);
 		$this->assertCount(1, $users);
-
-		return $users;
 	}
 
 	/**
 	 * @depends testCreateUser
 	 */
-	public function testCreatePost($users)
+	public function testCreatePost()
 	{
 		$post = new Post;
+
+		$users = $this->em->getRepository(User::class)->findAll();
 
 		$this->assertCount(1, $users);
 
