@@ -18,8 +18,6 @@ class Post
 	 */
 	public static function loadMetadata(ClassMetadata $metadata)
 	{
-		$metadata->setIdGeneratorType(ClassMetadata::GENERATOR_TYPE_AUTO);
-
 		$metadata->setPrimaryTable([
 			'name' => 'posts',
 		]);
@@ -30,6 +28,13 @@ class Post
 			'columnName' => 'id',
 			'type' => 'integer',
 			'length' => 9,
+		]);
+
+		$metadata->mapField([
+			'fieldName' => 'title',
+			'columnName' => 'title',
+			'type' => 'string',
+			'length' => 255,
 		]);
 
 		$metadata->mapManyToOne([
@@ -46,6 +51,13 @@ class Post
 	 * @var integer
 	 */
 	private $id;
+
+	/**
+	 * title
+	 *
+	 * @var string
+	 */
+	private $title;
 
 	/**
 	 * Author
@@ -65,6 +77,40 @@ class Post
 	}
 
 	/**
+	 * Set the post id
+	 *
+	 * @param integer $id
+	 *
+	 * @return void
+	 */
+	public function setId($id)
+	{
+		$this->id = $id;
+	}
+
+	/**
+	 * Get the post title
+	 *
+	 * @return string
+	 */
+	public function getTitle()
+	{
+		return $this->title;
+	}
+
+	/**
+	 * Set the post title
+	 *
+	 * @param string $title
+	 *
+	 * @return void
+	 */
+	public function setTitle($title)
+	{
+		$this->title = $title;
+	}
+
+	/**
 	 * Get the Author
 	 *
 	 * @return User
@@ -79,12 +125,10 @@ class Post
 	 *
 	 * @param User $author
 	 *
-	 * @return self
+	 * @return void
 	 */
 	public function setAuthor(User $author)
 	{
 		$this->author = $author;
-
-		return $this;
 	}
 }

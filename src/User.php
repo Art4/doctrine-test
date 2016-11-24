@@ -19,7 +19,7 @@ class User
 	 */
 	public static function loadMetadata(ClassMetadata $metadata)
 	{
-		$metadata->setIdGeneratorType(ClassMetadata::GENERATOR_TYPE_AUTO);
+		//$metadata->setIdGeneratorType(ClassMetadata::GENERATOR_TYPE_AUTO);
 
 		$metadata->setPrimaryTable([
 			'name' => 'users',
@@ -31,6 +31,13 @@ class User
 			'columnName' => 'id',
 			'type' => 'integer',
 			'length' => 9,
+		]);
+
+		$metadata->mapField([
+			'fieldName' => 'name',
+			'columnName' => 'name',
+			'type' => 'string',
+			'length' => 255,
 		]);
 
 		$metadata->mapOneToMany([
@@ -49,6 +56,13 @@ class User
 	private $id;
 
 	/**
+	 * name
+	 *
+	 * @var string
+	 */
+	private $name;
+
+	/**
 	 * posts
 	 *
 	 * @var Post[]
@@ -60,17 +74,51 @@ class User
 	 */
 	public function __construct()
 	{
-		$this->permissions = new ArrayCollection();
+		$this->posts = new ArrayCollection();
 	}
 
 	/**
-	 * Get the Post-ID
+	 * Get the User-ID
 	 *
 	 * @return integer
 	 */
 	public function getId()
 	{
 		return $this->id;
+	}
+
+	/**
+	 * Set the User-ID
+	 *
+	 * @param integer $id
+	 *
+	 * @return void
+	 */
+	public function setId($id)
+	{
+		$this->id = $id;
+	}
+
+	/**
+	 * Get the user name
+	 *
+	 * @return string
+	 */
+	public function getName()
+	{
+		return $this->name;
+	}
+
+	/**
+	 * Set the user name
+	 *
+	 * @param string $name
+	 *
+	 * @return void
+	 */
+	public function setName($name)
+	{
+		$this->name = $name;
 	}
 
 	/**
@@ -88,13 +136,11 @@ class User
 	 *
 	 * @param Post $post
 	 *
-	 * @return self
+	 * @return void
 	 */
 	public function addPost(Post $post)
 	{
 		$this->posts[] = $post;
 		$post->setAuthor($this);
-
-		return $this;
 	}
 }

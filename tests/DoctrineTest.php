@@ -18,18 +18,25 @@ class DoctrineTest extends \PHPUnit_Framework_TestCase
 	{
 		if (static::$entityManager === null)
 		{
-			static::$entityManager = $this->createEntityManager();
+			$db_file = __DIR__ . '/../tmp/db.sqlite3';
+
+			if (file_exists($db_file))
+			{
+				unlink($db_file);
+			}
+
+			static::$entityManager = $this->createEntityManager($db_file);
 
 			$pdo = static::$entityManager->getConnection()->getWrappedConnection();
 
-			$pdo->exec("CREATE TABLE posts (id integer(9), author_id integer(9))");
-			$pdo->exec("CREATE TABLE users (id integer(9))");
+			$pdo->exec("CREATE TABLE posts (id integer(9), title varchar(255), author_id integer(9))");
+			$pdo->exec("CREATE TABLE users (id integer(9), name varchar(255))");
 		}
 
 		$this->em = static::$entityManager;
 	}
 
-	private function createEntityManager()
+	private function createEntityManager($db_file)
 	{
 		// Create a simple "default" Doctrine ORM configuration for static PHP
 		$isDevMode = true;
@@ -42,40 +49,54 @@ class DoctrineTest extends \PHPUnit_Framework_TestCase
 		$conn = array(
 			'driver' => 'pdo_sqlite',
 			'path' => ':memory:',
+			//'path' => $db_file,
 		);
 
 		// obtaining the entity manager
 		return EntityManager::create($conn, $config);
 	}
 
-	public function testCreateUser()
+	public function testCreateUsers()
 	{
-		$user = new User;
+		$user1 = new User;
+		$user1->setId(1);
+		$user1->setName('Max');
+		$this->em->persist($user1);
 
-		$this->em->persist($user);
+		$user2 = new User;
+		$user2->setId(2);
+		$user2->setName('Moritz');
+		$this->em->persist($user2);
 
 		$this->em->flush();
-
-		$this->em->clear();
 
 		$users = $this->em->getRepository(User::class)->findAll();
 
 		$this->assertContainsOnlyInstancesOf(User::class, $users);
-		$this->assertCount(1, $users);
+
+		$result = [];
+
+		foreach ($users as $user)
+		{
+			$result[$user->getId()] = $user->getName();
+		}
+
+		$this->assertSame([
+			1 => 'Max',
+			2 => 'Moritz',
+		], $result);
 	}
 
 	/**
-	 * @depends testCreateUser
+	 * @depends testCreateUsers
 	 */
-	public function testCreatePost()
+	public function testCreatePosts()
 	{
+		$user = $this->em->getRepository(User::class)->findOneBy(['name' => 'Max']);
+
 		$post = new Post;
-
-		$users = $this->em->getRepository(User::class)->findAll();
-
-		$this->assertCount(1, $users);
-
-		$user = $users[0];
+		$post->setId(1);
+		$post->setTitle('Hello World!');
 
 		$user->addPost($post);
 
@@ -83,6 +104,31 @@ class DoctrineTest extends \PHPUnit_Framework_TestCase
 		$this->em->flush();
 
 		$posts = $this->em->getRepository(Post::class)->findAll();
+
+		$this->assertContainsOnlyInstancesOf(Post::class, $posts);
+		$result = [];
+
+		foreach ($posts as $post)
+		{
+			$result[$post->getId()] = $post->getTitle();
+		}
+
+		$this->assertSame([
+			1 => 'Hello World!',
+		], $result);
+
+
+		$this->assertCount(1, $posts);
+	}
+
+	/**
+	 * @depends testCreatePosts
+	 */
+	public function testGetPosts()
+	{
+		$user = $this->em->getRepository(User::class)->findOneBy(['name' => 'Max']);
+
+		$posts = $user->getPosts();
 
 		$this->assertCount(1, $posts);
 		$this->assertContainsOnlyInstancesOf(Post::class, $posts);
