@@ -92,20 +92,32 @@ class DoctrineTest extends \PHPUnit_Framework_TestCase
 	 */
 	public function testCreatePosts()
 	{
-		$user = $this->em->getRepository(User::class)->findOneBy(['name' => 'Max']);
+		$user1 = $this->em->getRepository(User::class)->find(1);
+		$user2 = $this->em->getRepository(User::class)->find(2);
 
-		$post = new Post;
-		$post->setId(1);
-		$post->setTitle('Hello World!');
+		$post1 = new Post;
+		$post1->setId(1);
+		$post1->setTitle('Hello World!');
 
-		$user->addPost($post);
+		$post2 = new Post;
+		$post2->setId(2);
+		$post2->setTitle('Awesome post');
 
-		$this->em->persist($post);
+		$post3 = new Post;
+		$post3->setId(3);
+		$post3->setTitle('10 ways to code');
+
+		$user1->addPost($post1);
+		$user1->addPost($post2);
+		$user2->addPost($post3);
+
 		$this->em->flush();
 
 		$posts = $this->em->getRepository(Post::class)->findAll();
 
+		$this->assertCount(3, $posts);
 		$this->assertContainsOnlyInstancesOf(Post::class, $posts);
+
 		$result = [];
 
 		foreach ($posts as $post)
@@ -115,10 +127,11 @@ class DoctrineTest extends \PHPUnit_Framework_TestCase
 
 		$this->assertSame([
 			1 => 'Hello World!',
+			2 => 'Awesome post',
+			3 => '10 ways to code',
 		], $result);
 
 
-		$this->assertCount(1, $posts);
 	}
 
 	/**
@@ -130,7 +143,7 @@ class DoctrineTest extends \PHPUnit_Framework_TestCase
 
 		$posts = $user->getPosts();
 
-		$this->assertCount(1, $posts);
+		$this->assertCount(2, $posts);
 		$this->assertContainsOnlyInstancesOf(Post::class, $posts);
 	}
 }
