@@ -130,8 +130,6 @@ class DoctrineTest extends \PHPUnit_Framework_TestCase
 			2 => 'Awesome post',
 			3 => '10 ways to code',
 		], $result);
-
-
 	}
 
 	/**
