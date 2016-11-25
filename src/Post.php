@@ -42,6 +42,12 @@ class Post
 			'targetEntity' => User::class,
 			'inversedBy' => 'posts',
 			'cascade' => ['persist', 'refresh'],
+			'joinColumns' => [
+				[
+					'name' => 'author_id',
+					'referencedColumnName' => 'user_id',
+				]
+			],
 		]);
 	}
 
