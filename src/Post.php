@@ -131,4 +131,16 @@ class Post
 	{
 		$this->author = $author;
 	}
+
+	/**
+	 * Add a comment
+	 *
+	 * @param Comment $comment
+	 *
+	 * @return void
+	 */
+	public function addComment(Comment $comment)
+	{
+		$comment->setParent($this);
+	}
 }

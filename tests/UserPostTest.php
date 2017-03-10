@@ -5,11 +5,12 @@ namespace Tests\DoctrineTest;
 use Doctrine\Common\Persistence\Mapping\Driver\StaticPHPDriver;
 use Doctrine\ORM\Tools\Setup;
 use Doctrine\ORM\EntityManager;
+use DoctrineTest\Comment;
 use DoctrineTest\User;
 use DoctrineTest\Post;
 use PHPUnit\Framework\TestCase;
 
-class DoctrineTest extends TestCase
+class UserPostTest extends TestCase
 {
 	private static $entityManager;
 
@@ -30,6 +31,7 @@ class DoctrineTest extends TestCase
 
 			$pdo = static::$entityManager->getConnection()->getWrappedConnection();
 
+			$pdo->exec("CREATE TABLE comments (id integer(9), content text, parent_type varchar(255), parent_id varchar(255), author_id integer(9))");
 			$pdo->exec("CREATE TABLE posts (id integer(9), title varchar(255), author_id integer(9))");
 			$pdo->exec("CREATE TABLE users (id integer(9), name varchar(255))");
 		}
@@ -144,5 +146,26 @@ class DoctrineTest extends TestCase
 
 		$this->assertCount(2, $posts);
 		$this->assertContainsOnlyInstancesOf(Post::class, $posts);
+	}
+
+	/**
+	 * @depends testGetPosts
+	 */
+	public function testCreateComments()
+	{
+		$post = $this->em->getRepository(Post::class)->find(1);
+		$user = $this->em->getRepository(User::class)->findOneBy(['name' => 'Max']);
+
+		$comment = new Comment();
+		$comment->setId(1);
+		$comment->setContent('Toller Beitrag, vielen Dank!');
+		$comment->setAuthor($user);
+
+		$post->addComment($comment);
+
+		$this->em->persist($comment);
+		$this->em->flush();
+
+		$this->assertInstanceOf(Comment::class, $comment);
 	}
 }
