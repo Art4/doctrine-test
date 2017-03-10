@@ -7,8 +7,9 @@ use Doctrine\ORM\Tools\Setup;
 use Doctrine\ORM\EntityManager;
 use DoctrineTest\User;
 use DoctrineTest\Post;
+use PHPUnit\Framework\TestCase;
 
-class DoctrineTest extends \PHPUnit_Framework_TestCase
+class DoctrineTest extends TestCase
 {
 	private static $entityManager;
 
