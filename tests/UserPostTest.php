@@ -39,7 +39,7 @@ class UserPostTest extends TestCase
 		$this->em = static::$entityManager;
 	}
 
-	private function createEntityManager($db_file)
+	private function createEntityManager($db_file = null)
 	{
 		// Create a simple "default" Doctrine ORM configuration for static PHP
 		$isDevMode = true;
@@ -48,11 +48,12 @@ class UserPostTest extends TestCase
 
 		$config->setMetadataDriverImpl(new StaticPHPDriver(array(__DIR__."/../src")));
 
+		$path = ($db_file === null) ? ':memory:' : $db_file;
+
 		// database configuration parameters
 		$conn = array(
 			'driver' => 'pdo_sqlite',
-			'path' => ':memory:',
-			//'path' => $db_file,
+			'path' => $path,
 		);
 
 		// obtaining the entity manager
