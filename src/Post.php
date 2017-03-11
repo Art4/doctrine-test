@@ -2,6 +2,8 @@
 
 namespace DoctrineTest;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Mapping\ClassMetadata;
 
 /**
@@ -18,6 +20,8 @@ class Post
 	 */
 	public static function loadMetadata(ClassMetadata $metadata)
 	{
+		$metadata->addEntityListener('postLoad', self::class, 'postLoadHandler');
+
 		$metadata->setPrimaryTable([
 			'name' => 'posts',
 		]);
@@ -45,6 +49,8 @@ class Post
 		]);
 	}
 
+	public $em;
+
 	/**
 	 * Post-ID
 	 *
@@ -65,6 +71,13 @@ class Post
 	 * @var Author
 	 */
 	private $author;
+
+	/**
+	 * Comments
+	 *
+	 * @var ArrayCollection
+	 */
+	private $comments;
 
 	/**
 	 * Get the Post-ID
@@ -142,5 +155,43 @@ class Post
 	public function addComment(Comment $comment)
 	{
 		$comment->setParent($this);
+
+		$this->comments[] = $comment;
 	}
+
+	/**
+	 * Get the comments
+	 *
+	 * @return Comment[]
+	 */
+	public function getComments()
+	{
+		if ($this->comments === null)
+		{
+			$comments = $this->em->getRepository(Comment::class)->find(
+				[
+					'parent_type' => 'post',
+					'parent_id' => $this->getId(),
+				],
+				[
+					'id' => 'asc',
+				]
+			);
+
+			$this->comments = new ArrayCollection($comments);
+		}
+
+		return $this->comments;
+	}
+
+	/**
+	 * Get the comments
+	 *
+	 * @return Comment[]
+	 */
+	public function postLoadHandler(Post $post, LifecycleEventArgs $args)
+	{
+		return $post->em = $args->getEntityManager();
+	}
+
 }

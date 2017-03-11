@@ -153,19 +153,33 @@ class UserPostTest extends TestCase
 	 */
 	public function testCreateComments()
 	{
+		$this->em->clear();
+
 		$post = $this->em->getRepository(Post::class)->find(1);
-		$user = $this->em->getRepository(User::class)->findOneBy(['name' => 'Max']);
+		$user1 = $this->em->getRepository(User::class)->findOneBy(['name' => 'Max']);
+		$user2 = $this->em->getRepository(User::class)->findOneBy(['name' => 'Moritz']);
 
-		$comment = new Comment();
-		$comment->setId(1);
-		$comment->setContent('Toller Beitrag, vielen Dank!');
-		$comment->setAuthor($user);
+		$comment1 = new Comment();
+		$comment1->setId(1);
+		$comment1->setContent('Toller Beitrag, vielen Dank!');
+		$comment1->setAuthor($user1);
 
-		$post->addComment($comment);
+		$post->addComment($comment1);
+		$this->em->persist($comment1);
 
-		$this->em->persist($comment);
+		$comment2 = new Comment();
+		$comment2->setId(2);
+		$comment2->setContent('Ja, das finde ich auch');
+		$comment2->setAuthor($user2);
+
+		$post->addComment($comment2);
+		$this->em->persist($comment2);
+
 		$this->em->flush();
 
-		$this->assertInstanceOf(Comment::class, $comment);
+		$comments = $post->getComments();
+
+		$this->assertCount(2, $comments);
+		$this->assertContainsOnlyInstancesOf(Comment::class, $comments);
 	}
 }

@@ -1,4 +1,4 @@
-/tmp/db.sqlite3
+/tmp
 /vendor
 composer.phar
 composer.lock
